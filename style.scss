@@ -1,76 +1,114 @@
-// 1. Переменные
-$primary-color: #3498db;
-$text-color: #333;
-$card-bg: #fff;
-$radius: 12px;
+// --- РџРµСЂРµРјРµРЅРЅС‹Рµ ---
+$bg-body: #000000;
+$bg-card: #111111;
+$text-main: #ffffff;
+$text-muted: #666666;
+$accent: #ffffff;
+$radius: 20px;
 
-// 2. Миксин для кнопки
-@mixin btn-style($bg-color) {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: $bg-color;
-    color: white;
+// --- РњРёРєСЃРёРЅС‹ ---
+@mixin btn-bw {
+    background-color: $accent;
+    color: $bg-body;
     border: none;
-    border-radius: 6px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1px;
     cursor: pointer;
-    text-decoration: none;
-    font-size: 16px;
-    transition: background 0.3s;
+    transition: transform 0.2s, opacity 0.2s;
 
     &:hover {
-        background-color: darken($bg-color, 10%);
+        opacity: 0.8;
+        transform: scale(1.05);
     }
 }
 
-// Базовые стили
+// --- Р‘Р°Р·РѕРІС‹Рµ СЃС‚РёР»Рё ---
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+    background-color: $bg-body;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
+    min-height: 100vh;
 }
 
-// 3. Вложенность
+// --- РљР°СЂС‚РѕС‡РєР° С‚РѕРІР°СЂР° ---
 .product-card {
-    background-color: $card-bg;
+    background-color: $bg-card;
+    width: 340px;
     border-radius: $radius;
-    width: 320px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 1px solid #333;
     overflow: hidden;
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.05);
 
-    &__image {
+    &__image-box {
         width: 100%;
-        height: 200px;
-        background: #ddd;
-        
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        height: 250px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    &__content {
-        padding: 20px;
+    &__img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: grayscale(100%);
+    }
+
+    &__info {
+        padding: 24px;
     }
 
     &__title {
-        color: $text-color;
-        margin-top: 0;
+        color: $text-main;
+        font-size: 20px;
+        margin: 0 0 12px;
+        line-height: 1.3;
     }
 
     &__desc {
-        color: lighten($text-color, 30%);
+        color: $text-muted;
+        font-size: 13px;
+        margin-bottom: 25px;
         line-height: 1.5;
+    }
+
+    &__bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 15px;
+        border-top: 1px solid #333;
+        padding-top: 20px;
+    }
+
+    &__prices {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__old-price {
+        color: $text-muted;
+        font-size: 14px;
+        text-decoration: line-through;
+        margin-bottom: 4px;
+    }
+
+    &__new-price {
+        color: $text-main;
+        font-size: 24px;
+        font-weight: 700;
     }
 }
 
-// Применяем миксин
+// --- РљРЅРѕРїРєР° ---
 .btn {
-    @include btn-style($primary-color);
-    width: 100%;
-    margin-top: 10px;
+    @include btn-bw;
 }
