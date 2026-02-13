@@ -1,0 +1,17 @@
+/* Error: Invalid UTF-8.
+ *   ,
+ * 1 | // 1. ����������
+ *   |       ^
+ *   '
+ *   style.scss 1:7  root stylesheet */
+
+body::before {
+  font-family: "Source Code Pro", "SF Mono", Monaco, Inconsolata, "Fira Mono",
+      "Droid Sans Mono", monospace, monospace;
+  white-space: pre;
+  display: block;
+  padding: 1em;
+  margin-bottom: 1em;
+  border-bottom: 2px solid black;
+  content: "Error: Invalid UTF-8.\a   \2577 \a 1 \2502  // 1. \fffd \fffd \fffd \fffd \fffd \fffd \fffd \fffd \fffd \fffd \a   \2502        ^\a   \2575 \a   style.scss 1:7  root stylesheet";
+}

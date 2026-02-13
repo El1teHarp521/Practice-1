@@ -1,0 +1,76 @@
+// 1. Переменные
+$primary-color: #3498db;
+$text-color: #333;
+$card-bg: #fff;
+$radius: 12px;
+
+// 2. Миксин для кнопки
+@mixin btn-style($bg-color) {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: $bg-color;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background 0.3s;
+
+    &:hover {
+        background-color: darken($bg-color, 10%);
+    }
+}
+
+// Базовые стили
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+// 3. Вложенность
+.product-card {
+    background-color: $card-bg;
+    border-radius: $radius;
+    width: 320px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+
+    &__image {
+        width: 100%;
+        height: 200px;
+        background: #ddd;
+        
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &__content {
+        padding: 20px;
+    }
+
+    &__title {
+        color: $text-color;
+        margin-top: 0;
+    }
+
+    &__desc {
+        color: lighten($text-color, 30%);
+        line-height: 1.5;
+    }
+}
+
+// Применяем миксин
+.btn {
+    @include btn-style($primary-color);
+    width: 100%;
+    margin-top: 10px;
+}
