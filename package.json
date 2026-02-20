@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/El1teHarp521/Practice-1#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "nanoid": "^3.3.11"
   }
 }
