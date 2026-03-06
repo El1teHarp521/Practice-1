@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 
 export default function ProductModal({ isOpen, onClose, onSubmit, initialData }) {
     const [formData, setFormData] = useState({
-        name: "", category: "", description: "", price: "", stock: "", image: ""
+        title: "", category: "", description: "", price: "", stock: "", image: ""
     });
 
     useEffect(() => {
         if (initialData) {
             setFormData(initialData);
         } else {
-            setFormData({ name: "", category: "", description: "", price: "", stock: "", image: "" });
+            setFormData({ title: "", category: "", description: "", price: "", stock: "", image: "" });
         }
     }, [initialData, isOpen]);
 
@@ -28,8 +28,8 @@ export default function ProductModal({ isOpen, onClose, onSubmit, initialData })
                 </h2>
                 <form onSubmit={handleSubmit} style={styles.form}>
                     <div style={styles.inputGroup}>
-                        <label style={styles.label}>Название</label>
-                        <input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required style={styles.input}/>
+                        <label style={styles.label}>Название (Title)</label>
+                        <input value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required style={styles.input}/>
                     </div>
                     <div style={styles.inputGroup}>
                         <label style={styles.label}>Категория</label>
@@ -65,49 +65,13 @@ export default function ProductModal({ isOpen, onClose, onSubmit, initialData })
 }
 
 const styles = {
-    overlay: { 
-        position: "fixed", top: 0, left: 0, right: 0, bottom: 0, 
-        background: "rgba(0,0,0,0.8)", 
-        display: "flex", justifyContent: "center", alignItems: "center",
-        zIndex: 1000
-    },
-    modal: { 
-        background: "#0b0f19", 
-        padding: "30px", 
-        width: "400px",
-        borderRadius: "12px",
-        border: "1px solid #333",
-        boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
-        color: "#fff"
-    },
+    overlay: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.8)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 },
+    modal: { background: "#0b0f19", padding: "30px", width: "400px", borderRadius: "12px", border: "1px solid #333", boxShadow: "0 10px 40px rgba(0,0,0,0.5)", color: "#fff" },
     form: { display: "flex", flexDirection: "column", gap: "15px" },
     inputGroup: { display: "flex", flexDirection: "column", gap: "5px", width: "100%" },
     label: { fontSize: "12px", color: "#888" },
-    input: { 
-        padding: "10px", 
-        background: "#111", 
-        color: "#fff",
-        border: "1px solid #333", 
-        borderRadius: "6px",
-        outline: "none",
-        fontSize: "14px",
-        fontFamily: "inherit"
-    },
+    input: { padding: "10px", background: "#111", color: "#fff", border: "1px solid #333", borderRadius: "6px", outline: "none", fontSize: "14px", fontFamily: "inherit" },
     buttons: { display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "15px" },
-    cancelBtn: { 
-        padding: "8px 16px", 
-        background: "transparent", 
-        color: "#888",
-        border: "none", 
-        cursor: "pointer"
-    },
-    submitBtn: { 
-        padding: "8px 20px", 
-        background: "#fff", 
-        color: "#000", 
-        border: "none", 
-        borderRadius: "6px",
-        cursor: "pointer",
-        fontWeight: "bold"
-    }
+    cancelBtn: { padding: "8px 16px", background: "transparent", color: "#888", border: "none", cursor: "pointer" },
+    submitBtn: { padding: "8px 20px", background: "#fff", color: "#000", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }
 };

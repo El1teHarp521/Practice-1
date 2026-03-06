@@ -8,6 +8,6 @@ const apiClient = axios.create({
 export const api = {
     getProducts: () => apiClient.get("/products").then(res => res.data),
     createProduct: (data) => apiClient.post("/products", data).then(res => res.data),
-    updateProduct: (id, data) => apiClient.patch(`/products/${id}`, data).then(res => res.data),
+    updateProduct: (id, data) => apiClient.put(`/products/${id}`, data).then(res => res.data),
     deleteProduct: (id) => apiClient.delete(`/products/${id}`).then(res => res.data),
 };

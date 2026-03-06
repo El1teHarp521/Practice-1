@@ -8,17 +8,13 @@ function App() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
-  useEffect(() => {
-    loadProducts();
-  }, []);
+  useEffect(() => { loadProducts(); }, []);
 
   const loadProducts = async () => {
     try {
       const data = await api.getProducts();
       setProducts(data);
-    } catch (error) {
-      alert("Ошибка загрузки данных");
-    }
+    } catch (error) { alert("Ошибка загрузки данных"); }
   };
 
   const handleCreate = () => {
@@ -47,14 +43,10 @@ function App() {
       }
       setModalOpen(false);
       loadProducts();
-    } catch (error) {
-      alert("Ошибка при сохранении");
-    }
+    } catch (error) { alert("Ошибка при сохранении"); }
   };
 
-  const formatPrice = (price) => {
-    return price.toLocaleString('ru-RU');
-  };
+  const formatPrice = (price) => price.toLocaleString('ru-RU');
 
   return (
     <div className="app-container">
@@ -65,35 +57,23 @@ function App() {
 
       <div className="products-grid">
         {products.map((p, index) => (
-          <div 
-            key={p.id} 
-            className="product-card"
-            style={{ animationDelay: `${index * 0.08}s` }}
-          >
+          <div key={p.id} className="product-card" style={{ animationDelay: `${index * 0.08}s` }}>
             <div className="product-card__image-box">
                 <span className="product-card__badge">{p.category}</span>
-                <img src={p.image} alt={p.name} className="product-card__img" />
+                <img src={p.image} alt={p.title} className="product-card__img" />
             </div>
 
             <div className="product-card__info">
-                <h3 className="product-card__title" title={p.name}>{p.name}</h3>
+                <h3 className="product-card__title" title={p.title}>{p.title}</h3>
                 <p className="product-card__desc" title={p.description}>{p.description}</p>
                 
-                <div className="product-card__stock">
-                  Остаток: <b>{p.stock} шт.</b>
-                </div>
+                <div className="product-card__stock">Остаток: <b>{p.stock} шт.</b></div>
                 
                 <div className="product-card__bottom">
-                    <div className="product-card__price">
-                        {formatPrice(p.price)} ₽
-                    </div>
+                    <div className="product-card__price">{formatPrice(p.price)} ₽</div>
                     <div className="product-card__actions">
-                        <button className="icon-btn icon-btn--edit" onClick={() => handleEdit(p)}>
-                          Изменить
-                        </button>
-                        <button className="icon-btn icon-btn--delete" onClick={() => handleDelete(p.id)}>
-                          Удалить
-                        </button>
+                        <button className="icon-btn icon-btn--edit" onClick={() => handleEdit(p)}>Изменить</button>
+                        <button className="icon-btn icon-btn--delete" onClick={() => handleDelete(p.id)}>Удалить</button>
                     </div>
                 </div>
             </div>
@@ -101,12 +81,7 @@ function App() {
         ))}
       </div>
 
-      <ProductModal 
-        isOpen={isModalOpen} 
-        onClose={() => setModalOpen(false)} 
-        onSubmit={handleFormSubmit}
-        initialData={editingProduct}
-      />
+      <ProductModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} onSubmit={handleFormSubmit} initialData={editingProduct} />
     </div>
   );
 }
