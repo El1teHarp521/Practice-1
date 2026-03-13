@@ -2,66 +2,43 @@ import React, { useEffect, useState } from "react";
 import { api } from "./api";
 import ProductModal from "./components/ProductModal";
 import Auth from "./components/Auth";
+import AdminPanel from "./components/AdminPanel";
 import "./App.scss"; 
 
 function App() {
   const [user, setUser] = useState(null); 
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [isModalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
-  useEffect(() => {
-    loadProducts();
-    checkAuth();
-  }, []);
+  useEffect(() => { loadProducts(); checkAuth(); }, []);
 
   const checkAuth = async () => {
-    try {
-      if (localStorage.getItem("accessToken")) {
-        const userData = await api.getMe();
-        setUser(userData);
-      }
-    } catch (error) {
-      setUser(null);
+    if (localStorage.getItem("accessToken")) {
+        try { setUser(await api.getMe()); } catch (e) { setUser(null); }
     }
   };
 
-  const handleLogout = () => {
-    api.logout();
-    setUser(null);
-  };
+  const loadProducts = async () => { try { setProducts(await api.getProducts()); } catch (e) {} };
 
-  const loadProducts = async () => {
+  const handleFormSubmit = async (data) => {
     try {
-      const data = await api.getProducts();
-      setProducts(data);
-    } catch (error) { console.error("Ошибка загрузки товаров"); }
+      if (editingProduct) await api.updateProduct(editingProduct.id, data);
+      else await api.createProduct(data);
+      setModalOpen(false); loadProducts();
+    } catch (e) { alert("Ошибка прав доступа!"); }
   };
-
-  const handleCreate = () => { setEditingProduct(null); setModalOpen(true); };
-  const handleEdit = (product) => { setEditingProduct(product); setModalOpen(true); };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Удалить этот товар?")) {
-      try {
-        await api.deleteProduct(id);
-        loadProducts();
-      } catch (e) { alert("Ошибка удаления. Вы не авторизованы."); }
+    if (window.confirm("Удалить товар?")) {
+      try { await api.deleteProduct(id); loadProducts(); } catch (e) { alert("Только для Админа!"); }
     }
   };
 
-  const handleFormSubmit = async (formData) => {
-    try {
-      if (editingProduct) await api.updateProduct(editingProduct.id, formData);
-      else await api.createProduct(formData);
-      setModalOpen(false);
-      loadProducts();
-    } catch (error) { alert("Ошибка при сохранении"); }
-  };
-
-  const formatPrice = (price) => price.toLocaleString('ru-RU');
+  const isAdmin = user?.role === 'admin';
+  const isSeller = user?.role === 'seller' || isAdmin;
 
   return (
     <div className="app-container">
@@ -70,58 +47,45 @@ function App() {
         <div className="user-panel">
             {user ? (
                 <>
-                    <span>Привет, {user.first_name}!</span>
-                    <button className="btn btn--outline" onClick={handleLogout}>Выйти</button>
-                    <button className="btn btn--create" onClick={handleCreate}>+ Добавить товар</button>
+                    <div className="user-info">
+                        <b>{user.first_name}</b>
+                        <span className="role-tag">{user.role}</span>
+                    </div>
+                    {isAdmin && <button className="btn btn--outline" onClick={() => setIsAdminOpen(true)}>Пользователи</button>}
+                    {isSeller && <button className="btn btn--create" onClick={() => {setEditingProduct(null); setModalOpen(true)}}>+ Товар</button>}
+                    <button className="btn btn--outline" onClick={() => { api.logout(); setUser(null); window.location.reload(); }}>Выйти</button>
                 </>
             ) : (
-                /* Если НЕ вошел - показываем кнопку Вход */
-                <button className="btn btn--create" onClick={() => setIsAuthOpen(true)}>Вход / Регистрация</button>
+                <button className="btn btn--create" onClick={() => setIsAuthOpen(true)}>Войти / Регистрация</button>
             )}
         </div>
       </header>
 
       <div className="products-grid">
-        {products.map((p, index) => (
-          <div key={p.id} className="product-card" style={{ animationDelay: `${index * 0.08}s` }}>
+        {products.map((p) => (
+          <div key={p.id} className="product-card">
             <div className="product-card__image-box">
                 <span className="product-card__badge">{p.category}</span>
                 <img src={p.image} alt={p.title} className="product-card__img" />
             </div>
-
             <div className="product-card__info">
-                <h3 className="product-card__title" title={p.title}>{p.title}</h3>
-                <p className="product-card__desc" title={p.description}>{p.description}</p>
-                
-                <div className="product-card__stock">Остаток: <b>{p.stock} шт.</b></div>
-                
+                <h3 className="product-card__title">{p.title}</h3>
+                <p className="product-card__desc">{p.description}</p>
                 <div className="product-card__bottom">
-                    <div className="product-card__price">{formatPrice(p.price)} ₽</div>
-                    
-                    {/* Кнопки Изменить/Удалить показываем ТОЛЬКО авторизованным */}
-                    {user && (
-                        <div className="product-card__actions">
-                            <button className="icon-btn icon-btn--edit" onClick={() => handleEdit(p)}>Изменить</button>
-                            <button className="icon-btn icon-btn--delete" onClick={() => handleDelete(p.id)}>Удалить</button>
-                        </div>
-                    )}
+                    <div className="product-card__price">{p.price?.toLocaleString('ru-RU')} ₽</div>
+                    <div className="product-card__actions">
+                        {isSeller && <button className="icon-btn" onClick={() => {setEditingProduct(p); setModalOpen(true)}}>Изменить</button>}
+                        {isAdmin && <button className="icon-btn icon-btn--delete" onClick={() => handleDelete(p.id)}>Удалить</button>}
+                    </div>
                 </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Всплывающее окно редактирования/создания товара */}
       <ProductModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} onSubmit={handleFormSubmit} initialData={editingProduct} />
-      
-      {/* Всплывающее окно Авторизации  */}
-      {isAuthOpen && (
-          <Auth 
-            onClose={() => setIsAuthOpen(false)} 
-            onLoginSuccess={() => { setIsAuthOpen(false); checkAuth(); }} 
-          />
-      )}
-
+      {isAuthOpen && <Auth onClose={() => setIsAuthOpen(false)} onLoginSuccess={() => { setIsAuthOpen(false); checkAuth(); }} />}
+      {isAdminOpen && <AdminPanel onClose={() => setIsAdminOpen(false)} />}
     </div>
   );
 }
