@@ -1,5 +1,5 @@
 // --- Переменные ---
-$bg-body: #0a0a0c;
+$bg-body: #0a0a0c; 
 $bg-card: #141418;
 $text-main: #ffffff;
 $text-muted: #8e8e93;
@@ -8,14 +8,8 @@ $radius: 20px;
 
 // --- Анимация появления карточек ---
 @keyframes floatUp {
-    0% {
-        opacity: 0;
-        transform: translateY(50px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    0% { opacity: 0; transform: translateY(50px); }
+    100% { opacity: 1; transform: translateY(0); }
 }
 
 // --- Базовые стили ---
@@ -30,7 +24,7 @@ body {
 }
 
 .app-container {
-    max-width: 1300px;
+    max-width: 1300px; 
     margin: 0 auto;
     padding: 60px 20px;
 }
@@ -53,6 +47,18 @@ body {
     }
 }
 
+.user-panel {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    span {
+        color: $text-muted;
+        font-weight: 600;
+        margin-right: 10px;
+    }
+}
+
 .btn--create {
     background-color: #fff;
     color: #000;
@@ -70,6 +76,24 @@ body {
     }
 }
 
+.btn--outline {
+    background-color: transparent;
+    color: $text-main;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 13px 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+        background-color: rgba(255,255,255,0.1);
+        border-color: rgba(255,255,255,0.3);
+    }
+}
+
+// --- СЕТКА ТОВАРОВ ---
 .products-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
@@ -93,18 +117,14 @@ body {
         border-color: rgba(255, 255, 255, 0.15);
         box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 255, 255, 0.05);
 
-        .product-card__img {
-            // приближение товара
-            transform: scale(1.25);
-        }
+        .product-card__img { transform: scale(1.25); }
     }
 
-    // --ЗОНА ДЛЯ ФОТО ---
     &__image-box {
         position: relative;
         width: 100%;
-        height: 300px;
-        background: #ffffff;
+        height: 300px; 
+        background: #ffffff; 
         display: flex;
         align-items: center;
         justify-content: center;
@@ -112,7 +132,6 @@ body {
         box-shadow: inset 0 -10px 20px rgba(0,0,0,0.05);
     }
 
-    // икнонка категории поверх фото
     &__badge {
         position: absolute;
         top: 20px;
@@ -139,7 +158,6 @@ body {
         mix-blend-mode: darken; 
     }
 
-    // --- НИЖНЯЯ ЧАСТЬ С ИНФО ---
     &__info {
         padding: 30px;
         display: flex;
@@ -209,7 +227,7 @@ body {
 
     &__price {
         color: $text-main;
-        font-size: 26px;
+        font-size: 26px; 
         font-weight: 900;
         letter-spacing: -0.5px;
         white-space: nowrap; 
@@ -245,5 +263,85 @@ body {
             background-color: rgba(255, 69, 58, 0.1);
             border-color: #ff453a;
         }
+    }
+}
+
+.auth-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 9999; 
+}
+
+.auth-card {
+    background: $bg-card;
+    width: 100%;
+    max-width: 400px;
+    padding: 40px;
+    border-radius: $radius;
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    text-align: center;
+    position: relative;
+
+    h2 { margin-top: 0; margin-bottom: 25px; }
+}
+
+.auth-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    
+    &:hover { color: #fff; }
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    input {
+        padding: 14px;
+        background: rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #fff;
+        border-radius: 10px;
+        outline: none;
+        font-family: inherit;
+        &:focus { border-color: rgba(255,255,255,0.5); }
+    }
+}
+
+.auth-error {
+    background: rgba(255, 69, 58, 0.1);
+    color: #ff453a;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    border: 1px solid rgba(255, 69, 58, 0.3);
+}
+
+.auth-toggle {
+    margin-top: 25px;
+    font-size: 14px;
+    color: $text-muted;
+
+    span {
+        color: $text-main;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: underline;
     }
 }
