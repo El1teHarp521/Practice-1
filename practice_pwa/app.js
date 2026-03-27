@@ -8,8 +8,7 @@ const inputReminderText = document.getElementById('reminder-text');
 const inputReminderTime = document.getElementById('reminder-time');
 const statusBadge = document.getElementById('network-status');
 
-// ОБНОВЛЕННЫЙ ПУБЛИЧНЫЙ КЛЮЧ
-const PUBLIC_VAPID_KEY = 'BF6L93rE4oN8m-yXz6Yv_uR9T8mG5W2QvA4pS2kM1jN7bV0cR3xP2tE1wS0fJkL9mR3nQ5pS6tU7vW8x9y0z1a';
+const PUBLIC_VAPID_KEY = 'BMD5dodqPL-fxpbcHBU-LVWUwZiWwYKyaj_oAm8FbeVJYot2MoTeNLWhuGdp6qP1p9GDDfqGgzHGqtqwWUXsZhA';
 
 function updateNetworkStatus() {
     if (navigator.onLine) {

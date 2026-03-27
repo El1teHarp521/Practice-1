@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -6,11 +7,15 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 
-// НОВЫЕ КЛЮЧИ (СГЕНЕРИРОВАНЫ ЗАНОВО)
 const vapidKeys = {
-    publicKey: 'BF6L93rE4oN8m-yXz6Yv_uR9T8mG5W2QvA4pS2kM1jN7bV0cR3xP2tE1wS0fJkL9mR3nQ5pS6tU7vW8x9y0z1a',
-    privateKey: 'v-E1w9S0fJkL2mR3nQ4pS5tU6vW7x8y9z0a1b2c3d4e'
+    publicKey: process.env.VAPID_PUBLIC_KEY,
+    privateKey: process.env.VAPID_PRIVATE_KEY
 };
+
+if (!vapidKeys.publicKey || !vapidKeys.privateKey) {
+    console.error("❌ ОШИБКА: Ключи VAPID не найдены в файле .env");
+    process.exit(1);
+}
 
 webpush.setVapidDetails(
     'mailto:admin@example.com',
@@ -43,7 +48,7 @@ io.on('connection', (socket) => {
         const delay = reminderTime - Date.now();
         if (delay <= 0) return; 
 
-        console.log(`⏱ Таймер: "${text}" через ${Math.round(delay/1000)} сек.`);
+        console.log(`⏱ Таймер запущен: "${text}"`);
 
         const timeoutId = setTimeout(() => {
             const payload = JSON.stringify({
@@ -66,7 +71,7 @@ io.on('connection', (socket) => {
             const reminder = reminders.get(reminderId);
             clearTimeout(reminder.timeoutId);
             reminders.delete(reminderId);
-            console.log(`❌ Удалено: "${reminder.text}"`);
+            console.log(`❌ Отменено: "${reminder.text}"`);
         }
     });
 
@@ -82,7 +87,7 @@ app.post('/snooze', (req, res) => {
 
     const newDelay = 5 * 60 * 1000;
     const newTimeoutId = setTimeout(() => {
-        const payload = JSON.stringify({ title: '⏰ Отложено!', body: reminder.text, reminderId: reminderId });
+        const payload = JSON.stringify({ title: '⏰ Отложенное!', body: reminder.text, reminderId: reminderId });
         subscriptions.forEach(sub => webpush.sendNotification(sub, payload).catch(e => {}));
         reminders.delete(reminderId);
     }, newDelay);

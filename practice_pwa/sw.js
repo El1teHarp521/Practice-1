@@ -1,4 +1,4 @@
-const CACHE_NAME = 'task-manager-v4';
+const CACHE_NAME = 'task-manager-v5';
 const ASSETS = [
     './',
     './index.html',
@@ -19,47 +19,25 @@ self.addEventListener('fetch', event => {
     event.respondWith(caches.match(event.request).then(res => res || fetch(event.request)));
 });
 
-// --- 1. Показ Push-уведомления ---
 self.addEventListener('push', (event) => {
-    let data = { title: 'Уведомление', body: '', reminderId: null };
-    
-    if (event.data) {
-        data = event.data.json();
-    }
-    
+    let data = { title: 'Напоминание', body: 'Посмотрите список задач' };
+    if (event.data) data = event.data.json();
     const options = {
         body: data.body,
         icon: './icons/icon-192.png',
         badge: './icons/icon-192.png',
         data: { reminderId: data.reminderId },
-        requireInteraction: true // Уведомление не исчезнет само по себе
+        requireInteraction: true,
+        actions: data.reminderId ? [{ action: 'snooze', title: '⏳ Отложить на 5 минут' }] : []
     };
-
-    if (data.reminderId) {
-        options.actions = [
-            { action: 'snooze', title: '⏳ Отложить на 5 минут' }
-        ];
-    }
-    
-    event.waitUntil(
-        self.registration.showNotification(data.title, options)
-    );
+    event.waitUntil(self.registration.showNotification(data.title, options));
 });
 
-// --- 2. Обработка клика по кнопке "Отложить" ---
 self.addEventListener('notificationclick', (event) => {
-    const notification = event.notification;
-    const action = event.action;
-
-    // Если нажали кнопку "Отложить"
-    if (action === 'snooze') {
-        const reminderId = notification.data.reminderId;
-        event.waitUntil(
-            fetch(`http://localhost:3001/snooze?reminderId=${reminderId}`, { method: 'POST' })
-                .then(() => notification.close())
-                .catch(err => console.error('Ошибка откладывания:', err))
-        );
+    const n = event.notification;
+    if (event.action === 'snooze') {
+        event.waitUntil(fetch(`http://localhost:3001/snooze?reminderId=${n.data.reminderId}`, { method: 'POST' }).then(() => n.close()));
     } else {
-        notification.close();
+        n.close();
     }
 });
