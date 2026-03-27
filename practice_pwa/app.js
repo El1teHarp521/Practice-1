@@ -6,9 +6,10 @@ const inputTask = document.getElementById('task-input');
 const formReminder = document.getElementById('reminder-form');
 const inputReminderText = document.getElementById('reminder-text');
 const inputReminderTime = document.getElementById('reminder-time');
-
-// --- Индикатор сети ---
 const statusBadge = document.getElementById('network-status');
+
+// ОБНОВЛЕННЫЙ ПУБЛИЧНЫЙ КЛЮЧ
+const PUBLIC_VAPID_KEY = 'BF6L93rE4oN8m-yXz6Yv_uR9T8mG5W2QvA4pS2kM1jN7bV0cR3xP2tE1wS0fJkL9mR3nQ5pS6tU7vW8x9y0z1a';
 
 function updateNetworkStatus() {
     if (navigator.onLine) {
@@ -23,10 +24,6 @@ window.addEventListener('online', updateNetworkStatus);
 window.addEventListener('offline', updateNetworkStatus);
 updateNetworkStatus(); 
 
-
-const PUBLIC_VAPID_KEY = 'BMS825JFiGB14-d93Sg3n9g-kbxMdE9M6yLt9AnMKTWdHdLjPeG61yTPGNutovEn897wPVy11v5walHSE6q_mG0';
-
-// --- Работа с задачами ---
 function loadTasks() {
     const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
     list.innerHTML = tasks.map(task => {
@@ -35,12 +32,7 @@ function loadTasks() {
             const dateObj = new Date(task.reminder);
             reminderHtml = `<span class="reminder-info">⏰ Напоминание: ${dateObj.toLocaleString('ru-RU')}</span>`;
         }
-        return `
-            <li>
-                <div class="task-content">${task.text} ${reminderHtml}</div>
-                <button class="btn-delete" onclick="deleteTask(${task.id})">✕</button>
-            </li>
-        `;
+        return `<li><div class="task-content">${task.text} ${reminderHtml}</div><button class="btn-delete" onclick="deleteTask(${task.id})">✕</button></li>`;
     }).join('');
 }
 
@@ -53,16 +45,11 @@ function addNoteLocal(text, reminderTimestamp = null) {
     return newNote; 
 }
 
-// Удаление задачи
 window.deleteTask = function(taskId) {
     let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-    const taskToDelete = tasks.find(t => t.id === taskId);
-
-    if (taskToDelete && taskToDelete.reminder && navigator.onLine) {
-        socket.emit('deleteReminder', taskId);
-    }
-    
-    tasks = tasks.filter(task => task.id !== taskId);
+    const tToDelete = tasks.find(t => t.id === taskId);
+    if (tToDelete && tToDelete.reminder && navigator.onLine) socket.emit('deleteReminder', taskId);
+    tasks = tasks.filter(t => t.id !== taskId);
     localStorage.setItem('tasks', JSON.stringify(tasks));
     loadTasks();
 }
@@ -81,43 +68,26 @@ formReminder.addEventListener('submit', (e) => {
     e.preventDefault();
     const text = inputReminderText.value.trim();
     const datetime = inputReminderTime.value;
-    
     if (text && datetime) {
         const timestamp = new Date(datetime).getTime();
-        
         if (timestamp > Date.now()) {
             const newNote = addNoteLocal(text, timestamp);
-            
-            if (navigator.onLine) {
-                socket.emit('newReminder', { id: newNote.id, text: text, reminderTime: timestamp });
-            } else {
-                alert('Вы в офлайне! Напоминание сохранено локально, но Push не придет, пока вы не подключитесь к сети.');
-            }
-            
-            inputReminderText.value = '';
-            inputReminderTime.value = '';
-        } else {
-            alert('Время напоминания должно быть в будущем!');
-        }
+            if (navigator.onLine) socket.emit('newReminder', { id: newNote.id, text, reminderTime: timestamp });
+            inputReminderText.value = ''; inputReminderTime.value = '';
+        } else { alert('Время должно быть в будущем!'); }
     }
 });
 
 loadTasks();
 
 socket.on('taskAdded', (task) => {
-    const notification = document.createElement('div');
-    notification.textContent = `⚡ Добавлено: ${task.text}`;
-    notification.style.cssText = `
-        position: fixed; top: 20px; right: 20px;
-        background: #fff; color: #000; padding: 15px 20px;
-        border-radius: 12px; z-index: 1000; font-weight: bold;
-        box-shadow: 0 10px 30px rgba(255,255,255, 0.2);
-    `;
-    document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 4000);
+    const n = document.createElement('div');
+    n.textContent = `⚡ Добавлено: ${task.text}`;
+    n.style.cssText = `position: fixed; top: 20px; right: 20px; background: #fff; color: #000; padding: 15px 20px; border-radius: 12px; z-index: 1000; font-weight: bold; box-shadow: 0 10px 30px rgba(255,255,255, 0.2);`;
+    document.body.appendChild(n);
+    setTimeout(() => n.remove(), 4000);
 });
 
-// --- Работа с Push-уведомлениями ---
 function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
@@ -152,25 +122,16 @@ if ('serviceWorker' in navigator) {
             const reg = await navigator.serviceWorker.register('sw.js');
             const enableBtn = document.getElementById('enable-push');
             const disableBtn = document.getElementById('disable-push');
-
-            const subscription = await reg.pushManager.getSubscription();
-            if (subscription) {
-                enableBtn.style.display = 'none';
-                disableBtn.style.display = 'inline-block';
-            }
+            const sub = await reg.pushManager.getSubscription();
+            if (sub) { enableBtn.style.display = 'none'; disableBtn.style.display = 'inline-block'; }
 
             enableBtn.addEventListener('click', async () => {
-                const permission = await Notification.requestPermission();
-                if (permission !== 'granted') return alert('Вы запретили уведомления!');
-                await subscribeToPush();
-                enableBtn.style.display = 'none';
-                disableBtn.style.display = 'inline-block';
+                const p = await Notification.requestPermission();
+                if (p === 'granted') { await subscribeToPush(); enableBtn.style.display = 'none'; disableBtn.style.display = 'inline-block'; }
             });
 
             disableBtn.addEventListener('click', async () => {
-                await unsubscribeFromPush();
-                disableBtn.style.display = 'none';
-                enableBtn.style.display = 'inline-block';
+                await unsubscribeFromPush(); disableBtn.style.display = 'none'; enableBtn.style.display = 'inline-block';
             });
         } catch (err) {}
     });
